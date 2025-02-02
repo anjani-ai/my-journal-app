@@ -1,0 +1,35 @@
+
+#### **📜 `backend/server.js` (Basic API)**
+```javascript
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+mongoose.connect('mongodb://localhost:27017/lifetrack', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+const journalSchema = new mongoose.Schema({
+  date: String,
+  entry: String
+});
+
+const Journal = mongoose.model('Journal', journalSchema);
+
+app.post('/addEntry', async (req, res) => {
+  const newEntry = new Journal(req.body);
+  await newEntry.save();
+  res.json({ message: 'Entry saved!' });
+});
+
+app.get('/entries', async (req, res) => {
+  const entries = await Journal.find();
+  res.json(entries);
+});
+
+app.listen(5000, () => console.log('Server running on port 5000'));
