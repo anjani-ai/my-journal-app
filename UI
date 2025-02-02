@@ -1,0 +1,57 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+const JournalApp = () => {
+  const [entry, setEntry] = useState("");
+  const [entries, setEntries] = useState([]);
+
+  useEffect(() => {
+    fetchEntries();
+  }, []);
+
+  const fetchEntries = async () => {
+    const res = await axios.get("http://localhost:5000/entries");
+    setEntries(res.data);
+  };
+
+  const saveEntry = async () => {
+    if (!entry) return;
+    await axios.post("http://localhost:5000/addEntry", {
+      date: new Date().toISOString().split("T")[0],
+      entry,
+    });
+    setEntry("");
+    fetchEntries();
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-10">
+      <h1 className="text-3xl font-bold text-center mb-5">📖 LifeTrack Journal</h1>
+      <div className="max-w-lg mx-auto bg-white p-5 rounded-lg shadow-lg">
+        <textarea
+          className="w-full p-2 border rounded"
+          rows="5"
+          placeholder="Write your thoughts..."
+          value={entry}
+          onChange={(e) => setEntry(e.target.value)}
+        ></textarea>
+        <button
+          className="mt-3 w-full bg-blue-500 text-white p-2 rounded"
+          onClick={saveEntry}
+        >
+          Save Entry
+        </button>
+      </div>
+      <h2 className="text-xl font-bold mt-10">Previous Entries</h2>
+      <ul className="mt-5">
+        {entries.map((item, index) => (
+          <li key={index} className="p-3 bg-white rounded shadow mb-2">
+            <strong>{item.date}</strong>: {item.entry}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default JournalApp;
