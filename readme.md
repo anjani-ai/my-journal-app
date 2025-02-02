@@ -30,3 +30,14 @@
 ```bash
 git clone https://github.com/your-username/LifeTrack.git
 cd LifeTrack
+
+2️⃣ Install dependencies
+
+bash
+
+npm install
+3️⃣ Run the app
+
+bash
+
+npm start
