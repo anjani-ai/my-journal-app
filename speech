@@ -1,0 +1,23 @@
+from fastapi import FastAPI, UploadFile, File
+import whisper
+import os
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+app = FastAPI()
+model = whisper.load_model("base")
+analyzer = SentimentIntensityAnalyzer()
+
+@app.post("/transcribe/")
+def transcribe_audio(file: UploadFile = File(...)):
+    file_path = f"temp_{file.filename}"
+    with open(file_path, "wb") as buffer:
+        buffer.write(file.file.read())
+    
+    result = model.transcribe(file_path)
+    os.remove(file_path)
+    return {"text": result["text"]}
+
+@app.post("/analyze_sentiment/")
+def analyze_sentiment(text: str):
+    score = analyzer.polarity_scores(text)
+    return {"sentiment_score": score}
